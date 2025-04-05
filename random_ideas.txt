@@ -1,0 +1,130 @@
+Project Name: Automata: Declarative Infrastructure-as-Code Engine
+
+Description:
+Automata is a DevOps automation tool that reimplements the core functionality of Terraform, focusing on declarative infrastructure management. The goal is to understand how Terraform-like tools parse, plan, and apply infrastructure changes.
+
+*   **Declarative Configuration:** Defines infrastructure state using a human-readable configuration language (similar to HCL).
+*   **Plan Generation:** Generates an execution plan based on the desired state and the current state of the infrastructure.
+*   **State Management:** Stores the current state of the infrastructure in a state file.
+*   **Change Application:** Applies the changes defined in the execution plan to the target infrastructure.
+*   **Resource Dependency Graph:** Understand the relationship between resources and optimize application order.
+*   **Limited Provider Support:** Starts with support for a single provider (e.g., AWS EC2) for simplicity. Focus is on core engine functionality, not comprehensive provider coverage.
+
+Tech Stack:
+*   **Rust:**
+    *   **Reasoning:** Rust's memory safety and performance are critical for a tool that directly manipulates infrastructure. Its strong error handling and focus on concurrency make it ideal for managing complex infrastructure changes. Moreover, it allows for building a single, statically linked binary for easy distribution.
+    *   **Cohesion:** Rust forms the core of the engine, handling parsing, planning, state management, and change application. Its performance and reliability ensure the engine operates efficiently and safely.
+    *   **Trade-offs:** Rust has a steeper learning curve than languages like Python or Go. However, the benefits in terms of performance and safety outweigh the initial investment for this type of project.
+*   **Parity Technologies' Substrate FRAME (Framework for Runtime Aggregation of Modularized Entities):**
+    *   **Reasoning:** While primarily known for blockchain development, Substrate's FRAME offers a powerful and modular framework for building state transition functions. This aligns perfectly with Automata's requirement to manage infrastructure state and define how it changes based on declarative configurations. Substrate's FRAME allows for creating custom logic for resource provisioning, updating, and deletion in a structured manner.
+    *   **Cohesion:** Substrate's FRAME will provide the state management, execution logic, and dependency management within the Automata engine. The Rust code base provides the glue between the declarative config and the FRAME module.
+    *   **Trade-offs:** Substrate has a learning curve related to blockchain concepts. However, it offers a robust and scalable state management solution that is not commonly used in infrastructure tooling, providing a unique educational experience. Other options considered included building a custom state management solution from scratch, but Substrate's FRAME offers a more structured and robust approach.
+*   **YAML (or JSON) for Configuration Language:**
+    *   **Reasoning:** YAML provides a human-readable and easily parsable configuration language. While HCL is the native language of Terraform, using YAML allows focusing on the core engine logic without getting bogged down in implementing a custom parser for HCL.
+    *   **Cohesion:** YAML is the input format for defining the desired infrastructure state. The Rust code parses the YAML and translates it into the internal representation used by the Substrate FRAME module to generate the execution plan.
+    *   **Trade-offs:** YAML is less feature-rich than HCL. However, for the scope of this project, its simplicity and ease of parsing make it a suitable choice.
+*   **AWS SDK for Rust (aws-sdk-rust):**
+    *   **Reasoning:** Provides the necessary interface for interacting with AWS resources. It allows Automata to create, update, and delete resources within an AWS account.
+    *   **Cohesion:** The AWS SDK is used by the Substrate FRAME module to perform the actual infrastructure changes. It provides the low-level API calls needed to provision resources within AWS.
+    *   **Trade-offs:** Using the AWS SDK ties Automata to AWS. However, for the purpose of learning, focusing on a single provider simplifies the project.
+
+
+
+--------------------------------------------------------------------------------
+
+Project Name: Shepherd: A Lightweight, Declarative Infrastructure-as-Code Orchestrator
+
+Description:
+Shepherd is a command-line tool designed to manage and deploy infrastructure using a declarative configuration file (similar to Terraform or CloudFormation, but much simpler). It focuses on providing a strong understanding of the underlying infrastructure management principles.
+
+*   **Declarative Configuration:** Users define the desired state of their infrastructure in a YAML file.
+*   **Resource Provisioning:** Shepherd interprets the configuration and interacts with cloud providers (initially focusing on AWS) to create, update, or delete resources.
+*   **Dependency Management:** Shepherd handles resource dependencies, ensuring resources are created in the correct order.
+*   **State Management:** Shepherd maintains a simple state file to track the current infrastructure state and detect changes.
+*   **Idempotency:** Shepherd ensures that applying the same configuration multiple times results in the same infrastructure state.
+*   **Limited Scope:** Intentionally avoids feature creep, focusing on core IaC principles and ease of understanding. Initially supports only EC2 instances, S3 buckets and IAM roles.
+
+Tech Stack:
+*   **Ballerina (Programming Language):**
+    *   Reasoning: Ballerina is a cloud-native programming language designed for integration and microservices. It excels at handling complex APIs and data transformations, making it ideal for interacting with cloud provider APIs. Its built-in support for concurrency and network protocols simplifies the development of asynchronous infrastructure provisioning logic. Also, it is less verbose than Java/Go and allows for faster development.
+    *   Cohesive Stack: Ballerina's integration capabilities will be used to orchestrate calls to the AWS SDK (via a Ballerina package) to provision resources.
+    *   Trade-offs: Ballerina has a smaller community than Go or Python. However, its focus on cloud-native development aligns perfectly with the project's goals, and the learning curve is relatively gentle. Go was considered, but Ballerina's built-in network and integration features offer a significant advantage for this specific use case.
+*   **YAML (Configuration Language):**
+    *   Reasoning: YAML is a human-readable data serialization format commonly used for configuration files. It's easy to parse and understand, making it suitable for defining infrastructure configurations.
+    *   Cohesive Stack: YAML configuration files will be parsed by Ballerina to determine the desired infrastructure state.
+    *   Trade-offs: JSON was considered, but YAML's readability makes it a better choice for user-defined configurations.
+*   **AWS SDK (for Ballerina):**
+    *   Reasoning: Provides the necessary API bindings to interact with AWS services. Ballerina has good support for calling native libraries.
+    *   Cohesive Stack: Ballerina code calls the AWS SDK to create, update, and delete resources based on the YAML configuration.
+    *   Trade-offs: Direct REST API calls could be used. However, the SDK provides a higher level of abstraction and simplifies error handling.
+*   **SQLite (for State Management):**
+    *   Reasoning: A lightweight, file-based database perfect for storing the infrastructure state. It simplifies state management without requiring a complex database setup.
+    *   Cohesive Stack: Ballerina code will interact with the SQLite database to store and retrieve information about the current infrastructure state.
+    *   Trade-offs: A simple JSON file could be used for state management. However, SQLite provides better data integrity and allows for more complex queries.
+
+
+--------------------------------------------------------------------------------
+
+Project Name: TinyML Keyword Spotting on RISC-V with Custom Accelerator
+
+Description:
+This project involves building a minimalist keyword spotting system for embedded devices, focusing on recognizing a single keyword ("Hey Google," "Alexa," etc.). The system will be entirely self-contained, running directly on a RISC-V microcontroller and leveraging a custom hardware accelerator for improved performance and energy efficiency.
+
+*   **Audio Acquisition:** Captures audio from a microphone.
+*   **Feature Extraction:** Extracts relevant features (e.g., Mel-Frequency Cepstral Coefficients - MFCCs) from the audio signal.
+*   **Keyword Detection:** Uses a small, pre-trained neural network to classify the extracted features and determine if the keyword is present.
+*   **Hardware Acceleration:** Implements a custom hardware accelerator (e.g., using FPGA fabric available on some RISC-V development boards) to accelerate the computationally intensive parts of the neural network inference.
+*   **Low Power Design:** Optimizes the system for minimal power consumption to enable battery-powered operation.
+
+Tech Stack:
+
+*   **RISC-V Microcontroller (e.g., SiFive HiFive Unmatched or similar):**
+    *   *Reasoning:* RISC-V is an open-source instruction set architecture (ISA) that allows for complete control and customization of the hardware. This is crucial for understanding low-level system behavior and implementing custom hardware accelerators. The HiFive Unmatched provides a powerful RISC-V platform with enough resources for both software development and FPGA prototyping.
+*   **FPGA Fabric (Available on some RISC-V boards like the HiFive Unmatched or a separate FPGA development board):**
+    *   *Reasoning:* This provides the ability to implement a custom hardware accelerator. The accelerator offloads computationally intensive tasks from the microcontroller's CPU, resulting in significant performance and energy efficiency gains.
+*   **TensorFlow Lite Micro (TFLite Micro):**
+    *   *Reasoning:* TFLite Micro is a lightweight version of TensorFlow designed for running machine learning models on microcontrollers. It provides the necessary tools for model conversion, optimization, and inference on resource-constrained devices.
+*   **C/C++:**
+    *   *Reasoning:* C/C++ are the standard languages for embedded systems development. They provide direct access to hardware resources and allow for efficient code optimization.
+*   **Verilog/VHDL (for Hardware Accelerator):**
+    *   *Reasoning:* These are hardware description languages used to design and implement the custom hardware accelerator on the FPGA.
+*   **Trade-offs and Alternatives:**
+    *   Instead of a full FPGA, a simpler dedicated DSP chip could be used, but this would reduce the flexibility and learning potential regarding custom hardware design.
+    *   A different microcontroller architecture (e.g., ARM Cortex-M) could be used, but the educational value of working with an open-source ISA like RISC-V is significant.
+    *   Instead of MFCCs, other feature extraction methods (e.g., spectrogram analysis) could be explored, but MFCCs are a well-established and efficient choice for keyword spotting.
+
+    *   *Cohesive Stack:* The C/C++ code running on the RISC-V microcontroller manages audio acquisition, feature extraction (potentially partially offloaded to the accelerator), and TFLite Micro inference. The Verilog/VHDL code defines the hardware accelerator, which is integrated into the RISC-V system through appropriate interfaces. TFLite Micro provides the interface to run the keyword detection model.
+
+
+--------------------------------------------------------------------------------
+
+Project Name: TinyQL: A Minimal GraphQL Engine
+
+Description:
+This project involves building a simplified, command-line GraphQL engine from scratch. The goal is to understand the core principles of GraphQL execution, request parsing, and data resolution.
+
+*   **Request Parsing:** Parse GraphQL query strings into an abstract syntax tree (AST).
+*   **Validation:** Validate the parsed query against a predefined schema.
+*   **Execution:** Traverse the AST, resolving fields against a data source (e.g., a simple in-memory database or a JSON file).
+*   **Response Generation:** Construct a JSON response based on the resolved data.
+*   **Error Handling:** Implement basic error handling for invalid queries and data resolution failures.
+*   **CLI Interface:** Provide a command-line interface to accept GraphQL queries and display the results.
+
+Tech Stack:
+
+*   **Rust:**
+    *   **Reasoning:** Rust's strong type system and memory safety features are excellent for building robust and performant systems. Its focus on zero-cost abstractions allows for efficient execution of GraphQL queries. The `pest` crate provides a straightforward way to define and parse grammars, making parsing GraphQL queries manageable. Rust also has a thriving ecosystem of libraries for JSON manipulation and CLI development.
+    *   **How it works in the stack:** Rust serves as the foundation for the entire engine, handling parsing, validation, execution, and response generation.
+    *   **Trade-offs:** Rust has a steeper learning curve than some other languages, but the benefits of performance and safety outweigh the initial investment. Alternatives like Go were considered, but Rust's memory safety and performance advantages make it a better fit for this system.
+*   **Pest:**
+    *   **Reasoning:** A parsing expression grammar (PEG) parser generator written in Rust. It allows you to define the grammar of GraphQL in a declarative way, and it generates a parser that can efficiently parse GraphQL queries.
+    *   **How it works in the stack:** Pest is used by Rust to parse the GraphQL query string into an abstract syntax tree (AST).
+    *   **Trade-offs:** While other parsing libraries exist, Pest's ease of use and integration with Rust make it a good choice for this project.
+*   **serde & serde_json:**
+    *   **Reasoning:** `serde` is a powerful serialization/deserialization framework for Rust. `serde_json` provides JSON support for serde, allowing easy handling of JSON data for both input (data source) and output (GraphQL response).
+    *   **How it works in the stack:** `serde` and `serde_json` are used to read the input data source (e.g., JSON file) and to format the GraphQL response.
+    *   **Trade-offs:** Alternative JSON libraries exist, but `serde` is the most widely used and well-supported in the Rust ecosystem.
+*   **clap:**
+    *   **Reasoning:** A simple-to-use, full featured, and efficient CLI argument parser. It makes creating a command-line interface for the TinyQL engine straightforward.
+    *   **How it works in the stack:** `clap` is used to handle command-line arguments, such as the path to the GraphQL query file and the data source.
+    *   **Trade-offs:** Other CLI argument parsers exist, but `clap` is commonly used and well-documented, making it a suitable choice for this project.
