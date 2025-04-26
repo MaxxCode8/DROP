@@ -4,6 +4,8 @@ import requests
 import json
 from dotenv import load_dotenv
 
+import battle_simulator
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -132,8 +134,8 @@ def save_lyrics_to_file(lyrics, filename):
         raise Exception(f"Error saving lyrics to file: {e}")
 
 # Main execution
-if __name__ == "__main__":
-    text_file = os.path.join("output.txt")
+def InitiateBattle():
+    text_file = os.path.join("project_ideas.txt")
     lyrics_file = os.path.join("lyrics.txt")
 
     api_key = os.getenv("GEMINI_API_KEY")
@@ -145,6 +147,7 @@ if __name__ == "__main__":
         prompt = generate_rap_battle_prompt(project1_name, project2_name, text_file)
         lyrics = call_gemini_api(api_key, prompt)
         save_lyrics_to_file(lyrics, lyrics_file)
+        battle_simulator.InitiateBattleSimulator(lyrics)
     except (FileNotFoundError, ValueError) as e:
         print(f"Error: {e}")
     except Exception as e:
